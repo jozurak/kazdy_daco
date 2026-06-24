@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Správa Hry - Zvierací Kraj</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-dragon"></i> Daco Game
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" data-target="station-view" class="active"><i class="fa-solid fa-map-location-dot"></i> Stanovisko</a></li>
+            <li><a href="#" data-target="admin-view"><i class="fa-solid fa-hammer"></i> Admin Panel</a></li>
+            <li><a href="#" data-target="battle-view"><i class="fa-solid fa-khanda"></i> Súboje</a></li>
+            <li><a href="#" data-target="setup-view"><i class="fa-solid fa-gear"></i> Setup</a></li>
+        </ul>
+        <div class="hamburger">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </nav>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <main class="container">
+        <!-- STANOVISKO VIEW -->
+        <section id="station-view" class="view active">
+            <header class="view-header">
+                <h2><i class="fa-solid fa-map-location-dot"></i> Stanovisko</h2>
+                <p>Vyberte staty, ktoré chcete spravovať. Peniaze tu nie sú dostupné.</p>
+            </header>
+            
+            <div class="stat-filters" id="station-stat-filters">
+                <!-- Checkboxes will be generated here -->
+            </div>
+
+            <div class="teams-grid" id="station-teams-grid">
+                <!-- Teams will be generated here -->
+            </div>
+        </section>
+
+        <!-- ADMIN VIEW -->
+        <section id="admin-view" class="view">
+            <header class="view-header">
+                <h2><i class="fa-solid fa-hammer"></i> Admin Panel</h2>
+                <p>Správa všetkých statov pre všetky družinky.</p>
+            </header>
+
+            <div class="admin-teams-grid" id="admin-teams-grid">
+                <!-- Teams will be generated here -->
+            </div>
+        </section>
+
+        <!-- BATTLE VIEW -->
+        <section id="battle-view" class="view">
+            <header class="view-header">
+                <h2><i class="fa-solid fa-khanda"></i> Súboje</h2>
+                <p>Spravujte priebeh súbojov medzi družinkami.</p>
+            </header>
+
+            <div id="battle-setup" class="battle-section active">
+                <div class="battle-selectors">
+                    <div class="team-selector">
+                        <h3>Vyzývateľ</h3>
+                        <select id="challenger-select">
+                            <option value="">Vyberte vyzývateľa...</option>
+                        </select>
+                        <div class="team-cooldown" id="challenger-cooldown"></div>
+                    </div>
+                    <div class="vs-badge">VS</div>
+                    <div class="team-selector">
+                        <h3>Vyzvaný</h3>
+                        <select id="challenged-select">
+                            <option value="">Vyberte vyzvaného...</option>
+                        </select>
+                        <div class="team-cooldown" id="challenged-cooldown"></div>
+                    </div>
+                </div>
+                <button id="btn-start-battle" class="btn btn-primary btn-large" disabled><i class="fa-solid fa-play"></i> Začať Súboj</button>
+            </div>
+
+            <div id="battle-arena" class="battle-section">
+                <div class="arena-header">
+                    <div class="team-card challenger-card" id="arena-challenger">
+                        <h3 class="team-name">Názov tímu</h3>
+                        <div class="people-count"><i class="fa-solid fa-users"></i> <span class="count">0</span></div>
+                        <div class="luck-count"><i class="fa-solid fa-clover"></i> Šťastie: <span class="count">0</span></div>
+                        <button class="btn btn-danger btn-surrender" data-role="challenger">Vzdávam sa</button>
+                    </div>
+                    <div class="vs-badge">VS</div>
+                    <div class="team-card challenged-card" id="arena-challenged">
+                        <h3 class="team-name">Názov tímu</h3>
+                        <div class="people-count"><i class="fa-solid fa-users"></i> <span class="count">0</span></div>
+                        <div class="luck-count"><i class="fa-solid fa-clover"></i> Šťastie: <span class="count">0</span></div>
+                        <button class="btn btn-danger btn-surrender" data-role="challenged">Vzdávam sa</button>
+                    </div>
+                </div>
+
+                <div class="arena-actions">
+                    <div class="turn-indicator" id="turn-indicator">Na ťahu je: <span>---</span></div>
+                    
+                    <div class="current-stat-display" id="current-stat-display">
+                        <span class="stat-label">Vygenerovaný stat:</span>
+                        <div class="stat-value" id="generated-stat-name">?</div>
+                        
+                        <div class="stat-comparison" id="stat-comparison">
+                            <!-- Show the comparison of the stat between teams -->
+                        </div>
+
+                        <div class="casualty-prediction" id="casualty-prediction">
+                            <!-- Show who will lose how many people -->
+                        </div>
+                    </div>
+
+                    <div class="battle-controls">
+                        <button id="btn-reroll-stat" class="btn btn-warning"><i class="fa-solid fa-dice"></i> Prehodiť stat (Šťastie)</button>
+                        <button id="btn-next-round" class="btn btn-success"><i class="fa-solid fa-forward-step"></i> Ďalšie kolo / Akceptovať</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="battle-result" class="battle-section">
+                <div class="result-card">
+                    <h2 id="battle-winner-text">Víťaz</h2>
+                    <p id="battle-result-details">Detaily o ziskoch a stratách...</p>
+                    <button id="btn-end-battle" class="btn btn-primary">Ukončiť súboj a uložiť</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETUP VIEW -->
+        <section id="setup-view" class="view">
+            <header class="view-header">
+                <h2><i class="fa-solid fa-gear"></i> Setup a Konštanty</h2>
+                <p>Nastavte herné mechaniky a konštanty.</p>
+            </header>
+
+            <div class="setup-grid">
+                <div class="setup-card">
+                    <h3>Režim klesania statov</h3>
+                    <select id="setup-tick-mode" style="margin-bottom: 1rem;">
+                        <option value="global">Spoločné (Globálne) klesanie</option>
+                        <option value="individual">Individuálne pre každý stat</option>
+                    </select>
+                    <button id="btn-save-tick-mode" class="btn btn-primary" style="width: 100%;">Uložiť režim</button>
+                </div>
+
+                <div class="setup-card" id="setup-card-global">
+                    <h3>Globálne klesanie statov</h3>
+                    <p class="text-sm">Ako často (v sekundách) majú plošne klesnúť všetky staty o 1.</p>
+                    <div class="input-group">
+                        <input type="number" id="setup-global-tick" min="10">
+                        <span class="input-addon">s</span>
+                        <button id="btn-save-global-tick" class="btn btn-primary">Uložiť</button>
+                    </div>
+                    <div class="tick-status">
+                        Ďalšie klesnutie za: <span id="tick-countdown">--</span>
+                    </div>
+                </div>
+
+                <div class="setup-card" id="setup-card-individual">
+                    <h3>Individuálne klesanie</h3>
+                    <p class="text-sm">Nastavte čas v sekundách pre každý stat osobitne.</p>
+                    <div id="specific-ticks-container" class="settings-list">
+                        <!-- Generated from JS -->
+                    </div>
+                    <button id="btn-save-individual-tick" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Uložiť časy</button>
+                    <div class="tick-status">
+                        <span id="individual-tick-countdown" style="font-size:0.9rem; font-weight:normal;"></span>
+                    </div>
+                </div>
+
+                <div class="setup-card">
+                    <h3>Ekonomika a Súboje</h3>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <label>Strata peňazí pri prehre (%)</label>
+                            <div class="input-group">
+                                <input type="number" id="setup-money-loss" min="0" max="100">
+                                <span class="input-addon">%</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Cooldown: Vyzývateľ nemôže vyzývať (min)</label>
+                            <div class="input-group">
+                                <input type="number" id="setup-challenger-no-attack" min="0">
+                                <span class="input-addon">m</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Cooldown: Vyzývateľ nemôže byť vyzvaný (min)</label>
+                            <div class="input-group">
+                                <input type="number" id="setup-challenger-no-be-attacked" min="0">
+                                <span class="input-addon">m</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Cooldown: Vyzvaný nemôže vyzývať (min)</label>
+                            <div class="input-group">
+                                <input type="number" id="setup-challenged-no-attack" min="0">
+                                <span class="input-addon">m</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <label>Cooldown: Vyzvaný nemôže byť vyzvaný (min)</label>
+                            <div class="input-group">
+                                <input type="number" id="setup-challenged-no-be-attacked" min="0">
+                                <span class="input-addon">m</span>
+                            </div>
+                        </div>
+                        <button id="btn-save-economy" class="btn btn-primary" style="margin-top: 15px; width: 100%;">Uložiť ekonomiku</button>
+                    </div>
+                </div>
+                
+                 <div class="setup-card">
+                    <h3>Správa dát</h3>
+                    <button id="btn-reset-db" class="btn btn-danger" style="width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> Resetovať databázu na predvolené hodnoty</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <!-- Hlavný skript aplikácie -->
+    <script src="app.js"></script>
+</body>
+</html>
