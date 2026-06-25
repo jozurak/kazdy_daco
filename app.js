@@ -677,6 +677,11 @@ document.getElementById('btn-reroll-stat').addEventListener('click', () => {
     generateBattleStat();
 });
 
+document.getElementById('btn-admin-reroll-stat').addEventListener('click', () => {
+    // Admin reroll nezvyšuje počet použitých prehodení, takže nestojí "šťastie"
+    generateBattleStat();
+});
+
 document.getElementById('btn-next-round').addEventListener('click', () => {
     // Aplikovanie strát z aktuálneho statu
     const cT = dbTeams[battleState.challenger];
