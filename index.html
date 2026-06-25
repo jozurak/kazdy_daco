@@ -17,6 +17,7 @@
             <li><a href="#" data-target="station-view" class="active"><i class="fa-solid fa-map-location-dot"></i> Stanovisko</a></li>
             <li><a href="#" data-target="admin-view"><i class="fa-solid fa-hammer"></i> Admin Panel</a></li>
             <li><a href="#" data-target="battle-view"><i class="fa-solid fa-khanda"></i> Súboje</a></li>
+            <li><a href="#" data-target="generator-view"><i class="fa-solid fa-calculator"></i> Generátor</a></li>
             <li><a href="#" data-target="setup-view"><i class="fa-solid fa-gear"></i> Setup</a></li>
         </ul>
         <div class="hamburger">
@@ -129,6 +130,37 @@
                     <p id="battle-result-details">Detaily o ziskoch a stratách...</p>
                     <button id="btn-end-battle" class="btn btn-primary">Ukončiť súboj a uložiť</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- GENERATOR VIEW -->
+        <section id="generator-view" class="view">
+            <header class="view-header">
+                <h2><i class="fa-solid fa-calculator"></i> Generátor</h2>
+                <p>Pomocník pre generovanie matíc a kontrolu statov.</p>
+            </header>
+
+            <div class="setup-card" style="margin-bottom: 2rem;">
+                <h3 style="text-align: center;">Dostupné staty na tomto stanovisku</h3>
+                <div class="stat-filters" id="generator-stat-filters" style="margin-bottom: 0; background: transparent; border: none; box-shadow: none;">
+                    <!-- Checkboxes will be generated here -->
+                </div>
+            </div>
+
+            <div class="teams-grid" id="generator-teams-grid" style="margin-bottom: 2rem;">
+                <!-- Teams will be generated here -->
+            </div>
+
+            <div class="setup-card" style="margin-bottom: 2rem; text-align: center;">
+                <h3>Generátor Matíc</h3>
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                    <button id="btn-gen-2x2" class="btn btn-primary btn-large">Vygenerovať 2x2</button>
+                    <button id="btn-gen-3x3" class="btn btn-primary btn-large">Vygenerovať 3x3</button>
+                </div>
+            </div>
+
+            <div id="matrix-results-container" style="display: flex; flex-direction: column; gap: 2rem;">
+                <!-- Generated matrices will appear here -->
             </div>
         </section>
 

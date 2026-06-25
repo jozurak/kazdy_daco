@@ -51,6 +51,7 @@ teamsRef.on('value', (snapshot) => {
     if (snapshot.exists()) {
         dbTeams = snapshot.val();
         renderStationView();
+        renderGeneratorView();
         renderAdminView();
         updateBattleSelectors();
         
@@ -241,6 +242,75 @@ function renderStationFilters() {
     });
 }
 renderStationFilters(); // Init once
+
+// Generator view filters (local only, no DB sync needed)
+let selectedGeneratorStats = new Set();
+function renderGeneratorFilters() {
+    const container = document.getElementById('generator-stat-filters');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    ALL_STATS.forEach(stat => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'checkbox-wrapper';
+        
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = `gen-filter-${stat}`;
+        input.value = stat;
+        
+        input.addEventListener('change', (e) => {
+            if (e.target.checked) selectedGeneratorStats.add(stat);
+            else selectedGeneratorStats.delete(stat);
+            renderGeneratorView();
+        });
+        
+        const label = document.createElement('label');
+        label.htmlFor = `gen-filter-${stat}`;
+        label.textContent = stat.charAt(0).toUpperCase() + stat.slice(1);
+        
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        container.appendChild(wrapper);
+    });
+}
+renderGeneratorFilters();
+
+function renderGeneratorView() {
+    const container = document.getElementById('generator-teams-grid');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    if (!dbTeams || Object.keys(dbTeams).length === 0) return;
+
+    Object.values(dbTeams).forEach(team => {
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.style.borderColor = team.color;
+        
+        let statsHtml = '';
+        ALL_STATS.forEach(stat => {
+            if (selectedGeneratorStats.has(stat)) {
+                statsHtml += `
+                    <div class="stat-row">
+                        <span class="stat-name">${stat}</span>
+                        <div class="stat-controls">
+                            <button class="btn btn-icon btn-danger" onclick="updateStat('${team.id}', '${stat}', -1)">-</button>
+                            <span class="stat-value">${team.stats[stat] || 0}</span>
+                            <button class="btn btn-icon btn-success" onclick="updateStat('${team.id}', '${stat}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        
+        card.innerHTML = `
+            <div class="team-header" style="background-color: ${team.color}40">${team.name}</div>
+            <div class="team-stats">${statsHtml || '<p class="text-sm" style="text-align:center;">Žiadne staty nie sú vybrané.</p>'}</div>
+        `;
+        container.appendChild(card);
+    });
+}
 
 function renderStationView() {
     const container = document.getElementById('station-teams-grid');
@@ -780,3 +850,86 @@ function showToast(message, type = 'success') {
         toast.addEventListener('animationend', () => toast.remove());
     }, 3000);
 }
+
+// --- Matrix Generator Logic ---
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generateMatrix(size) {
+    let matrix = [];
+    for (let i = 0; i < size; i++) {
+        let row = [];
+        for (let j = 0; j < size; j++) {
+            row.push(getRandomInt(-9, 9));
+        }
+        matrix.push(row);
+    }
+    return matrix;
+}
+
+function multiplyMatrices(a, b, size) {
+    let result = [];
+    for (let i = 0; i < size; i++) {
+        let row = [];
+        for (let j = 0; j < size; j++) {
+            let sum = 0;
+            for (let k = 0; k < size; k++) {
+                sum += a[i][k] * b[k][j];
+            }
+            row.push(sum);
+        }
+        result.push(row);
+    }
+    return result;
+}
+
+function buildMatrixHTML(matrix, size, isHidden) {
+    let html = `<div class="matrix-wrapper"><div class="matrix ${isHidden ? 'matrix-hidden matrix-result' : ''}" style="grid-template-columns: repeat(${size}, 1fr);">`;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            let val = matrix[i][j];
+            html += `<div class="matrix-cell">${val}</div>`;
+        }
+    }
+    html += `</div></div>`;
+    return html;
+}
+
+function createMatrixExample(size) {
+    const matrixA = generateMatrix(size);
+    const matrixB = generateMatrix(size);
+    const matrixC = multiplyMatrices(matrixA, matrixB, size);
+    
+    const rowEl = document.createElement('div');
+    rowEl.className = 'matrix-row';
+    
+    const htmlA = buildMatrixHTML(matrixA, size, false);
+    const htmlB = buildMatrixHTML(matrixB, size, false);
+    const htmlC = buildMatrixHTML(matrixC, size, true); // Skrytý výsledok
+    
+    rowEl.innerHTML = `
+        <button class="btn btn-icon btn-danger matrix-delete-btn"><i class="fa-solid fa-trash"></i></button>
+        ${htmlA}
+        <div class="matrix-operator"><i class="fa-solid fa-xmark"></i></div>
+        ${htmlB}
+        <div class="matrix-operator">=</div>
+        ${htmlC}
+    `;
+    
+    // Delete event
+    rowEl.querySelector('.matrix-delete-btn').addEventListener('click', () => {
+        rowEl.remove();
+    });
+    
+    // Reveal event
+    const resultMatrix = rowEl.querySelector('.matrix-hidden');
+    resultMatrix.addEventListener('click', function() {
+        this.classList.add('revealed');
+    });
+    
+    document.getElementById('matrix-results-container').prepend(rowEl);
+}
+
+document.getElementById('btn-gen-2x2').addEventListener('click', () => createMatrixExample(2));
+document.getElementById('btn-gen-3x3').addEventListener('click', () => createMatrixExample(3));

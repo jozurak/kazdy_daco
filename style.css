@@ -649,3 +649,75 @@ select {
         font-size: 2rem;
     }
 }
+
+/* Matrix Generator Styles */
+.matrix-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--card-border);
+    position: relative;
+    overflow-x: auto;
+}
+
+.matrix-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.matrix {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-left: 2px solid var(--text-main);
+    border-right: 2px solid var(--text-main);
+    border-radius: 4px;
+    background: rgba(0,0,0,0.2);
+}
+
+.matrix-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.matrix-operator {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--warning);
+}
+
+.matrix-result {
+    position: relative;
+}
+
+.matrix-hidden {
+    filter: blur(8px);
+    cursor: pointer;
+    transition: filter 0.3s ease;
+    user-select: none;
+}
+
+.matrix-hidden:hover {
+    filter: blur(6px);
+}
+
+.matrix-hidden.revealed {
+    filter: blur(0);
+    cursor: default;
+}
+
+.matrix-delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
